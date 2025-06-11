@@ -1,0 +1,417 @@
+{
+  "name": "AI-Powered Tweet Summarizer",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Tweet Summarizer ",
+        "formDescription": "Give The  Link of the Tweet and get the Summary of the tweet!",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Post Link",
+              "placeholder": "Give The Post Link You Want To summarize ",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -860,
+        140
+      ],
+      "id": "2f0c37e8-b42d-49f6-af4a-13bfb71a6aeb",
+      "name": "On form submission",
+      "webhookId": "2965f022-c997-463c-9dd8-5dc821294bee"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/pratikdani~twitter-posts-scraper/run-sync-get-dataset-items?token=apify_api_8CezsYnslO0fbXx4Pp3OyV7yk9ngi33Esvfa",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"url\": \"{{ $json['Post Link'] }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -640,
+        140
+      ],
+      "id": "5ffa042f-f500-410d-bb2e-3560d3ade52b",
+      "name": "post scraper"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "44e147fa-6625-4301-8d20-755f5ff8fb4c",
+              "name": "description",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "d0132785-cdc6-4f0a-a37a-5619e6d1299e",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "f97e605e-42cd-4103-b6de-781ed56cbe3d",
+              "name": "hashtags",
+              "value": "={{ $json.hashtags }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -420,
+        140
+      ],
+      "id": "506b455e-956a-4527-bd53-62a1eaf5559d",
+      "name": "taking only use full features"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.description }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        360
+      ],
+      "id": "5a5a2da4-e466-457b-849a-b733b49cf262",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Summarize the following post:\n{{ $json.description }}{{ $json.name }}{{ $json.hashtags }}\nand return and json file like \n\n{\n  \"title\": \"\",\n  \"summary\": \"\",\n  \"sentiment\": \"Positive /Neutral /Negative\"\n}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -168,
+        140
+      ],
+      "id": "38fc1e23-2bcc-4f07-b201-81feaca9206f",
+      "name": "tweet analysis"
+    },
+    {
+      "parameters": {
+        "content": "## AI-Powered Tweet Summarizer\n",
+        "height": 480,
+        "width": 1460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -980,
+        60
+      ],
+      "typeVersion": 1,
+      "id": "119861e3-a985-4f8b-92f1-ef351fbd5926",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 420,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -260,
+        100
+      ],
+      "typeVersion": 1,
+      "id": "f52c5f27-d6f7-4e1c-ae85-7f4557405dcd",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-exp",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        360
+      ],
+      "id": "803a3230-cf79-4dc3-aedb-be3ff070a4de",
+      "name": "Google Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GfkusCXRArxwOxFy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"title\": \"How AI Is Changing Education\",\n  \"summary\": \"The article explores how artificial intelligence is revolutionizing education by automating administrative tasks, enabling personalized learning, and enhancing student engagement.\",\n  \"sentiment\": \"Positive\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        40,
+        360
+      ],
+      "id": "9087b26d-0b5c-4edd-a851-afb226189d38",
+      "name": "Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1B02oSDrIZ9OzqFyVvajI92M6E6o0KOsJNULkmvafKH8",
+          "mode": "list",
+          "cachedResultName": "tweet analysis ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B02oSDrIZ9OzqFyVvajI92M6E6o0KOsJNULkmvafKH8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "summary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B02oSDrIZ9OzqFyVvajI92M6E6o0KOsJNULkmvafKH8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $json.output.title }}",
+            "summary": "={{ $json.output.summary }}",
+            "sentiment": "={{ $json.output.sentiment }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        240,
+        140
+      ],
+      "id": "30d667ae-c3f9-4dd7-bba4-31e4670c74b3",
+      "name": "store's data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5zx7LSFXTXbQ6ulb",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Post Link": "https://x.com/elonmusk/status/1932695486684950962",
+          "submittedAt": "2025-06-11T05:47:52.677-04:00",
+          "formMode": "test"
+        }
+      }
+    ],
+    "post scraper": [
+      {
+        "json": {
+          "biography": null,
+          "bookmarks": 8298,
+          "date_posted": "2025-06-11T07:04:46.000Z",
+          "description": "I regret some of my posts about President @realDonaldTrump last week. They went too far.",
+          "external_image_urls": null,
+          "external_url": null,
+          "external_video_urls": null,
+          "followers": 220997405,
+          "following": 1144,
+          "hashtags": null,
+          "id": "1932695486684950962",
+          "input": {
+            "url": "https://x.com/elonmusk/status/1932695486684950962"
+          },
+          "is_verified": false,
+          "likes": 159600,
+          "name": "Elon Musk",
+          "parent_post_details": {
+            "post_id": null,
+            "profile_id": "44196397",
+            "profile_name": "Elon Musk"
+          },
+          "photos": null,
+          "posts_count": 79900,
+          "profile_image_link": "https://pbs.twimg.com/profile_images/1926284313365979137/o2cF3MeJ_normal.jpg",
+          "quoted_post": {
+            "data_posted": null,
+            "description": null,
+            "photos": null,
+            "post_id": null,
+            "profile_id": null,
+            "profile_name": null,
+            "url": null,
+            "videos": null
+          },
+          "quotes": 13387,
+          "replies": 35129,
+          "reposts": 18800,
+          "tagged_users": [
+            {
+              "biography": null,
+              "followers": null,
+              "following": null,
+              "is_verified": null,
+              "profile_id": "25073877",
+              "profile_name": "Donald J. Trump",
+              "url": "https://x.com/realDonaldTrump"
+            }
+          ],
+          "timestamp": "2025-06-11T09:49:00.153Z",
+          "url": "https://x.com/elonmusk/status/1932695486684950962",
+          "user_posted": "elonmusk",
+          "verification_type": "blue",
+          "videos": null,
+          "views": 10635011
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "post scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post scraper": {
+      "main": [
+        [
+          {
+            "node": "taking only use full features",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "taking only use full features": {
+      "main": [
+        [
+          {
+            "node": "tweet analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "tweet analysis",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tweet analysis": {
+      "main": [
+        [
+          {
+            "node": "store's data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "tweet analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "tweet analysis",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2bbfd858-1be6-4dbb-a9dd-93e10b565919",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "153a5b13df76e30d9113d345de4e72e31fdad105e16c2af7bab01690e0a9b78a"
+  },
+  "id": "KkAIUujtGJSXoQjL",
+  "tags": []
+}
