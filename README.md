@@ -10,7 +10,7 @@ This is a powerful, no-code automation workflow built using [n8n](https://n8n.io
 - Analyzes sentiment (Positive/Neutral/Negative),
 - Stores the results in a connected Google Sheet.
 
-
+---
 
 ## 🚀 Features
 
@@ -20,7 +20,7 @@ This is a powerful, no-code automation workflow built using [n8n](https://n8n.io
 - 📊 Google Sheets integration for storing output
 - 🧠 Uses Langchain-style memory (optional) for better AI flow
 
-
+---
 
 ## 🛠 How to Use This Workflow
 
