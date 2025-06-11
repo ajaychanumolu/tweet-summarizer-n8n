@@ -2,7 +2,7 @@
 ## _Using AI agents in n8n_
 
 
-![Tweet Summarizer UI](./Screenshot_2025-06-11_153636.png)
+![Tweet Summarizer UI](./Assets/Screenshot_2025-06-11_153636.png)
 
 This is a powerful, no-code automation workflow built using [n8n](https://n8n.io) that:
 - Takes a tweet link as input,
